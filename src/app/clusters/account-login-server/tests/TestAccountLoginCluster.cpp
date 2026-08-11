@@ -24,8 +24,10 @@
 #include <app/clusters/account-login-server/account-login-server.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/tests/test-ember-api.h>
+#include <clusters/AccountLogin/Enums.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
@@ -407,4 +409,17 @@ TEST_F(TestAccountLoginCluster, ReadOAuthLoggedIn)
     mDelegate.mOAuthLoggedIn = false;
     EXPECT_EQ(ReadScalarAttributeViaAttrAccess(kTestEndpointId, Attributes::OAuthLoggedIn::Id, loggedIn), CHIP_NO_ERROR);
     EXPECT_FALSE(loggedIn);
+}
+
+TEST_F(TestAccountLoginCluster, ReadFeatureMap)
+{
+    mDelegate.mFeatureMap = to_underlying(Feature::kOAuth);
+
+    uint32_t featureMap = 0;
+    EXPECT_EQ(ReadScalarAttributeViaAttrAccess(kTestEndpointId, Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, to_underlying(Feature::kOAuth));
+
+    mDelegate.mFeatureMap = 0;
+    EXPECT_EQ(ReadScalarAttributeViaAttrAccess(kTestEndpointId, Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
 }
